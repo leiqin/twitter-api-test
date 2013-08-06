@@ -1,0 +1,28 @@
+twitter-api-test
+================
+
+一个测试 Twitter API 的命令行小工具
+
+在 <https://dev.twitter.com/apps> 上创建应用后，
+修改 config.py 中的 consumer\_key 和 consumer\_secret 
+为对应的值，就可以使用了。
+
+比如：
+	
+	./cmdline.py -p count=5 -p trim_user=true statuses/home_timeline
+
+就可以获得用户的时间线，具体信息可以参考 [Twitter API](https://dev.twitter.com/docs/api/1.1/)
+返回的是 JSON 格式，本程序只是简单的把它输出到控制台而已，可以将它重定向到 JSON 文件中：
+
+	./cmdline.py -p count=5 -p trim_user=true statuses/home_timeline >/tmp/test.json
+
+然后用浏览器或者其他查看 JSON 的工具查看。
+
+第一次使用时，会需要授权，程序会自动打开浏览器，授权之后，就会看到 PIN-Code ，
+把它输入到控制台，回车即可。
+
+可以参考：[Implementing Sign in with Twitter](https://dev.twitter.com/docs/auth/implementing-sign-twitter) 和 [PIN-based authorization](https://dev.twitter.com/docs/auth/pin-based-authorization)
+， 生成的 Token 会储存到 config.json 中。
+
+也可以使用 [Tokens from dev.twitter.com](https://dev.twitter.com/docs/auth/tokens-devtwittercom)
+生成的 Token ，把对应的 access\_token 和 access\_token\_secret 配置到 config.py 就行了。

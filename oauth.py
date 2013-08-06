@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # https://dev.twitter.com/docs/auth/authorizing-request
 # https://dev.twitter.com/docs/auth/creating-signature
-# https://dev.twitter.com/docs/auth/implementing-sign-twitter
 # https://dev.twitter.com/docs/auth/tokens-devtwittercom
 # https://dev.twitter.com/docs/auth/implementing-sign-twitter
 # https://dev.twitter.com/docs/auth/pin-based-authorization

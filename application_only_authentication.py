@@ -39,6 +39,20 @@ def invalidateg_bearer_token(consumer_key, consumer_secret, access_token):
 
 	urllib2.urlopen(req)
 
+def build_request(url, method, bearer,
+		query_params=None, body_params=None):
+	real_url = url
+	if query_params:
+		real_url = real_url + '?' + urllib.urlencode(query_params)
+	req = urllib2.Request(real_url)
+	req.add_header('Authorization', 'Bearer ' + bearer)
+	if method.upper() == 'POST':
+		req.data = ''
+	if body_params:
+		req.data = urllib.urlencode(body_params)
+		req.add_header('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8')
+	return req
+
 
 if __name__ == '__main__':
 	import config
@@ -47,8 +61,8 @@ if __name__ == '__main__':
 		print 'access_token: ' + access_token
 		#invalidateg_bearer_token(config.consumer_key, config.consumer_secret, access_token)
 
-		req = urllib2.Request('https://api.twitter.com/1.1/statuses/user_timeline.json?count=100&screen_name=twitterapi')
-		req.add_header('Authorization', 'Bearer ' + access_token)
+		req = build_request( 'https://api.twitter.com/1.1/statuses/user_timeline.json', 
+				'GET', access_token, query_params={'count':100,'screen_name':'twitterapi'})
 		response = urllib2.urlopen(req)
 		print '%s %s' % (response.getcode(), response.msg)
 		print response.info()

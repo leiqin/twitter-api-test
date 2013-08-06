@@ -11,7 +11,7 @@ twitter-api-test
 	
 	./cmdline.py -p count=5 -p trim_user=true statuses/home_timeline
 
-就可以获得用户的时间线，具体信息可以参考 [Twitter API](https://dev.twitter.com/docs/api/1.1/)
+就可以获得用户的时间线，具体信息可以参考 [Twitter API](https://dev.twitter.com/docs/api/1.1/) ，
 返回的是 JSON 格式，本程序只是简单的把它输出到控制台而已，可以将它重定向到 JSON 文件中：
 
 	./cmdline.py -p count=5 -p trim_user=true statuses/home_timeline >/tmp/test.json

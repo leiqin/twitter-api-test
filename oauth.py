@@ -7,7 +7,6 @@
 # https://dev.twitter.com/docs/auth/pin-based-authorization
 
 import time, urllib, string, random, hmac, hashlib, base64, urllib2, webbrowser, sys
-from util import print_response
 
 alphanumeric = string.lowercase + string.uppercase + string.digits
 
@@ -128,19 +127,14 @@ def authorize(consumer_key, consumer_secret, input_callback=_default_input_callb
 	requst_token = result['oauth_token']
 	requst_token_secret = result['oauth_token_secret']
 	oauth_callback_confirmed = bool(result['oauth_callback_confirmed'])
-	#print 'oauth_callback_confirmed : %s' % oauth_callback_confirmed
-	#print 'requst_token : %s' % requst_token
-	#print 'requst_token_secret : %s' % requst_token_secret
 	webbrowser.open('https://api.twitter.com/oauth/authorize?oauth_token=' + requst_token)
-	#webbrowser.open('https://api.twitter.com/oauth/authenticate?oauth_token=' + requst_token)
-	if input_callback:
+	if oauth_callback_confirmed: 
 		pin_code = input_callback()
 	else:
-		print 'Please Enter PIN Code :',
-		pin_code = None
-		while not pin_code:
-			pin_code = sys.stdin.readline().strip()
-		print 'PIN Code is ' + pin_code
+		print 'oauth_callback_confirmed : %s' % oauth_callback_confirmed
+		print 'requst_token : %s' % requst_token
+		print 'requst_token_secret : %s' % requst_token_secret
+		raise Exception("oauth_callback_confirmed is not true")
 
 	req = build_request('https://api.twitter.com/oauth/access_token', 'POST',
 			consumer_key, consumer_secret,

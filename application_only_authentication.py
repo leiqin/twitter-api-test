@@ -2,71 +2,58 @@
 # https://dev.twitter.com/docs/auth/application-only-auth
 
 import urllib, urllib2, base64, json
-from util import print_response
 
 def _get_bearer_token_credentials(consumer_key, consumer_secret):
-    RFC_1738_encoded_consumer_key =  urllib.quote_plus(consumer_key)
-    RFC_1738_encoded_consumer_secret = urllib.quote_plus(consumer_secret)
+	RFC_1738_encoded_consumer_key =  urllib.quote_plus(consumer_key)
+	RFC_1738_encoded_consumer_secret = urllib.quote_plus(consumer_secret)
 
-    Bearer_token_credentials = \
-                    RFC_1738_encoded_consumer_key + ':' + RFC_1738_encoded_consumer_secret
-    Base64_encoded_bearer_token_credentials = \
-                    base64.encodestring(Bearer_token_credentials).replace('\n', '')
-    return Base64_encoded_bearer_token_credentials
+	Bearer_token_credentials = \
+					RFC_1738_encoded_consumer_key + ':' + RFC_1738_encoded_consumer_secret
+	Base64_encoded_bearer_token_credentials = \
+					base64.encodestring(Bearer_token_credentials).replace('\n', '')
+	return Base64_encoded_bearer_token_credentials
 
 def get_assess_token(consumer_key, consumer_secret):
-    bearer_token_credentials = _get_bearer_token_credentials(consumer_key, consumer_secret)
+	bearer_token_credentials = _get_bearer_token_credentials(consumer_key, consumer_secret)
 
-    req = urllib2.Request('https://api.twitter.com/oauth2/token')
-    req.add_header('Authorization', 'Basic ' + bearer_token_credentials)
-    req.add_header('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8')
-    req.data = 'grant_type=client_credentials'
+	req = urllib2.Request('https://api.twitter.com/oauth2/token')
+	req.add_header('Authorization', 'Basic ' + bearer_token_credentials)
+	req.add_header('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8')
+	req.data = 'grant_type=client_credentials'
 
-    try:
-        response = urllib2.urlopen(req)
-    except urllib2.HTTPError, e:
-        #print '%s %s' % (e.code, e.msg)
-        #print e.fp.read()
-        raise e
+	response = urllib2.urlopen(req)
 
-    #print_response(response)
-    result = json.load(response)
-    if result['token_type'] == "bearer":
-        access_token = result["access_token"]
-        #print 'access_token: ' + access_token
-        return access_token
-    else:
-        raise Exception('token type is not bearer')
+	result = json.load(response)
+	if result['token_type'] == "bearer":
+		access_token = result["access_token"]
+		return access_token
+	else:
+		raise Exception('token type is not bearer')
 
 def invalidateg_bearer_token(consumer_key, consumer_secret, access_token):
-    bearer_token_credentials = _get_bearer_token_credentials(consumer_key, consumer_secret)
+	bearer_token_credentials = _get_bearer_token_credentials(consumer_key, consumer_secret)
 
-    req = urllib2.Request('https://api.twitter.com/oauth2/invalidate_token')
-    req.add_header('Authorization', 'Basic ' + bearer_token_credentials)
-    req.data = 'access_token=' + access_token
+	req = urllib2.Request('https://api.twitter.com/oauth2/invalidate_token')
+	req.add_header('Authorization', 'Basic ' + bearer_token_credentials)
+	req.data = 'access_token=' + access_token
 
-    try:
-        urllib2.urlopen(req)
-    except urllib2.HTTPError, e:
-        #print '%s %s' % (e.code, e.msg)
-        #print e.fp.read()
-        raise e
+	urllib2.urlopen(req)
 
-
-def main():
-    import config
-    try:
-        access_token = get_assess_token(config.consumer_key, config.consumer_secret)
-        print 'access_token: ' + access_token
-        #invalidateg_bearer_token(config.consumer_key, config.consumer_secret, access_token)
-
-        req = urllib2.Request('https://api.twitter.com/1.1/statuses/user_timeline.json?count=100&screen_name=twitterapi')
-        req.add_header('Authorization', 'Bearer ' + access_token)
-        response = urllib2.urlopen(req)
-        print_response(response)
-    except urllib2.HTTPError, e:
-        print '%s %s' % (e.code, e.msg)
-        print e.fp.read()
 
 if __name__ == '__main__':
-    main()
+	import config
+	try:
+		access_token = get_assess_token(config.consumer_key, config.consumer_secret)
+		print 'access_token: ' + access_token
+		#invalidateg_bearer_token(config.consumer_key, config.consumer_secret, access_token)
+
+		req = urllib2.Request('https://api.twitter.com/1.1/statuses/user_timeline.json?count=100&screen_name=twitterapi')
+		req.add_header('Authorization', 'Bearer ' + access_token)
+		response = urllib2.urlopen(req)
+		print '%s %s' % (response.getcode(), response.msg)
+		print response.info()
+		print 
+		print response.read()
+	except urllib2.HTTPError, e:
+		print '%s %s' % (e.code, e.msg)
+		print e.fp.read()

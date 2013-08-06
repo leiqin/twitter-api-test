@@ -26,3 +26,5 @@ twitter-api-test
 
 也可以使用 [Tokens from dev.twitter.com](https://dev.twitter.com/docs/auth/tokens-devtwittercom)
 生成的 Token ，把对应的 access\_token 和 access\_token\_secret 配置到 config.py 就行了。
+
+(PS: 本程序不自带翻墙功能，请使用 VPN 或其他翻墙工具)

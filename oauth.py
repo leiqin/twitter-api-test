@@ -70,7 +70,7 @@ def _oauth_header(oauth):
 
 def _parse_response(response):
 	body = response.read().strip()
-	return util.parse_result(body)
+	return util.urldecode(body)
 
 def build_request(url, method, consumer_key, consumer_secret, 
 		access_token=None, access_token_secret=None,

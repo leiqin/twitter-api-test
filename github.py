@@ -34,7 +34,7 @@ def authorize(client_id, client_secret):
 			'code' : code}
 	url = url + '?' + urllib.urlencode(params)
 	response = urllib2.urlopen(url)
-	result = util.parse_result(response.read().strip())
+	result = util.urldecode(response.read().strip())
 	access_token = result['access_token']
 	return access_token
 
@@ -52,7 +52,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		s = self.path
 		i = s.index('?')
 		s = s[i+1:]
-		result = util.parse_result(s)
+		result = util.urldecode(s)
 		if result['state'] == state:
 			global code
 			code = result['code']

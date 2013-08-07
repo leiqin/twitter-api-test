@@ -21,10 +21,14 @@ twitter-api-test
 第一次使用时，会需要授权，程序会自动打开浏览器，授权之后，就会看到 PIN-Code ，
 把它输入到控制台，回车即可。
 
-可以参考：[Implementing Sign in with Twitter](https://dev.twitter.com/docs/auth/implementing-sign-twitter) 和 [PIN-based authorization](https://dev.twitter.com/docs/auth/pin-based-authorization)
+可以参考：[Implementing Sign in with Twitter](https://dev.twitter.com/docs/auth/implementing-sign-twitter) ， [PIN-based authorization](https://dev.twitter.com/docs/auth/pin-based-authorization) ，
+[Authorizing a request](https://dev.twitter.com/docs/auth/authorizing-request) 和 
+[Creating a signature](https://dev.twitter.com/docs/auth/creating-signature)
 ， 生成的 Token 会储存到 config.json 中。
 
 也可以使用 [Tokens from dev.twitter.com](https://dev.twitter.com/docs/auth/tokens-devtwittercom)
 生成的 Token ，把对应的 access\_token 和 access\_token\_secret 配置到 config.py 就行了。
 
 (PS: 本程序不自带翻墙功能，请使用 VPN 或其他翻墙工具)
+
+[GitHub OAuth](http://developer.github.com/v3/oauth)

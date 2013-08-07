@@ -38,7 +38,12 @@ def load_from_json():
 	config.access_token_secret = cf.get('access_token_secret', config.access_token_secret)
 	config.github_access_token = cf.get('github_access_token', config.github_access_token)
 
-def parse_result(value):
+def urldecode(value):
+	if not value:
+		return {}
+	value = value.strip()
+	if not value:
+		return {}
 	arr = value.split('&')
 	result = {}
 	for s in arr:

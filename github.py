@@ -73,7 +73,9 @@ def _get_params(arr):
 	return params
 
 parser = argparse.ArgumentParser(
-		description='A Tool For test GitHub API http://developer.github.com/')
+		description='A Tool For test GitHub API http://developer.github.com/ , \
+				you need to set the application\'s callback URL to \
+				"http://localhost:8000" or set the github_access_token in config.py')
 parser.add_argument('-p', '--params', type=str, action='append', 
 		help='HTTP Params, Format name=value, you can set many times, \
 				like "-p type=all -p sort=updated"')

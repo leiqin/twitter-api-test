@@ -6,6 +6,7 @@
 # https://dev.twitter.com/docs/auth/pin-based-authorization
 
 import time, urllib, string, random, hmac, hashlib, base64, urllib2, webbrowser, sys
+import util
 
 alphanumeric = string.lowercase + string.uppercase + string.digits
 
@@ -69,16 +70,7 @@ def _oauth_header(oauth):
 
 def _parse_response(response):
 	body = response.read().strip()
-	arr = body.split('&')
-	result = {}
-	for s in arr:
-		i = s.index('=')
-		key = s[:i]
-		value = s[i+1:]
-		key = urllib.unquote_plus(key)
-		value = urllib.unquote_plus(value)
-		result[key] = value
-	return result
+	return util.parse_result(body)
 
 def build_request(url, method, consumer_key, consumer_secret, 
 		access_token=None, access_token_secret=None,

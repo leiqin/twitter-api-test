@@ -10,6 +10,12 @@ access_token_secret = None
 # https://dev.twitter.com/docs/auth/application-only-auth
 bearer = None
 
+# github
+github_client_id = "Your GitHub App Client ID"
+github_client_secret = "Your GitHub App Client Secret"
+
+github_access_token = None
+
 try:
     from config_local import *
 except ImportError:

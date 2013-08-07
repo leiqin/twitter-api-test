@@ -21,25 +21,22 @@ def init(app_only=False, force=False):
 		else:
 			config.access_token, config.access_token_secret = \
 					oauth.authorize(config.consumer_key, config.consumer_secret)
-		util.save_to_json(app_only)
+		util.save_to_json()
 
 	if app_only:
 		if not config.bearer:
-			try:
-				util.load_from_json(app_only)
-			except Exception:
-				config.bearer = application_only_authentication.get_assess_token(
-						config.consumer_key, config.consumer_secret)
-				util.save_to_json(app_only)
-
+			util.load_from_json()
+		if not config.bearer:
+			config.bearer = application_only_authentication.get_assess_token(
+					config.consumer_key, config.consumer_secret)
+			util.save_to_json()
 	else:
 		if not config.access_token or not config.access_token_secret:
-			try:
-				util.load_from_json(app_only)
-			except Exception:
-				config.access_token, config.access_token_secret = \
-						oauth.authorize(config.consumer_key, config.consumer_secret)
-				util.save_to_json(app_only)
+			util.load_from_json()
+		if not config.access_token or not config.access_token_secret:
+			config.access_token, config.access_token_secret = \
+					oauth.authorize(config.consumer_key, config.consumer_secret)
+			util.save_to_json()
 
 parser = argparse.ArgumentParser(
 		description='A Tool For Test Twitter API https://dev.twitter.com/docs/api/1.1')

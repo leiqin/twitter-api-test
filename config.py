@@ -11,6 +11,7 @@ access_token_secret = None
 bearer = None
 
 # github
+# http://developer.github.com
 github_client_id = "Your GitHub App Client ID"
 github_client_secret = "Your GitHub App Client Secret"
 

@@ -15,7 +15,6 @@ code = None
 # You need to set your Website with Facebook Login to http://localhost:8000
 # and App Domains to localhost
 def authorize(app_id, app_secret):
-	# TODO
 	url = 'https://www.facebook.com/dialog/oauth'
 	params = {'client_id' : app_id,
 			'response_type' : 'code',
@@ -29,6 +28,7 @@ def authorize(app_id, app_secret):
 
 	webbrowser.open(url)
 	httpd.handle_request()
+	httpd.server_close()
 
 	if not code:
 		raise Exception('Code is None')

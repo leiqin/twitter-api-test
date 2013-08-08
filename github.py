@@ -26,6 +26,7 @@ def authorize(client_id, client_secret):
 
 	webbrowser.open(url)
 	httpd.handle_request()
+	httpd.server_close()
 
 	if not code:
 		raise Exception('Code is None')

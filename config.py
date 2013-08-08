@@ -17,6 +17,13 @@ github_client_secret = "Your GitHub App Client Secret"
 
 github_access_token = None
 
+# facebook
+# https://developers.facebook.com
+facebook_app_id = "Your Facebook App ID"
+facebook_app_secret = "Your Facebook App Secret"
+
+facebook_access_token = None
+
 try:
     from config_local import *
 except ImportError:

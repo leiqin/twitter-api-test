@@ -50,15 +50,19 @@ def init():
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 	def do_GET(self):
-		s = urlparse(self.path).query
-		result = util.urldecode(s)
-		if result['state'] == state:
-			global code
-			code = result['code']
-			self.wfile.write('Hello world')
-		else:
-			print result
-			self.wfile.write(result)
+		try:
+			s = urlparse(self.path).query
+			result = util.urldecode(s)
+			if result['state'] == state:
+				global code
+				code = result['code']
+				self.wfile.write('Hello world')
+			else:
+				print self.path
+				self.wfile.write(self.path)
+		except Exception:
+			print self.path
+			self.wfile.write(self.path)
 
 def _get_params(arr):
 	if not arr:
@@ -81,15 +85,15 @@ parser.add_argument('-p', '--params', type=str, action='append',
 parser.add_argument('url', type=str, help='URL For API, like "user/repos"')
 
 if __name__ == '__main__':
-	args = parser.parse_args()
-	url = args.url
-	if not url.startswith('https://'):
-		url = prefix + url
-	params = _get_params(args.params)
-	init()
-	params['access_token'] = config.github_access_token
-	url = url + '?' + urllib.urlencode(params)
 	try:
+		args = parser.parse_args()
+		url = args.url
+		if not url.startswith('https://'):
+			url = prefix + url
+		params = _get_params(args.params)
+		init()
+		params['access_token'] = config.github_access_token
+		url = url + '?' + urllib.urlencode(params)
 		response = urllib2.urlopen(url)
 		print response.read()
 	except urllib2.HTTPError, e:

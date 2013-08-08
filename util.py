@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import config, json, os.path, urllib
+import config, json, os.path, urllib, sys, traceback
 
 def print_response(response):
     print '%s %s' % (response.getcode(), response.msg)
@@ -17,6 +17,8 @@ def _load_json_file():
 		cf = json.load(open(_json_file()))
 		return cf
 	except Exception:
+		print >>sys.stderr, 'load json file Errer'
+		traceback.print_exc()
 		return {}
 
 def save_to_json():
@@ -29,6 +31,8 @@ def save_to_json():
 		cf['access_token_secret'] = config.access_token_secret
 	if config.github_access_token:
 		cf['github_access_token'] = config.github_access_token
+	if config.facebook_access_token:
+		cf['facebook_access_token'] = config.facebook_access_token
 	json.dump(cf, open(_json_file(), 'w'), indent=4)
 
 def load_from_json():
@@ -37,6 +41,7 @@ def load_from_json():
 	config.access_token = cf.get('access_token', config.access_token)
 	config.access_token_secret = cf.get('access_token_secret', config.access_token_secret)
 	config.github_access_token = cf.get('github_access_token', config.github_access_token)
+	config.facebook_access_token = cf.get('facebook_access_token', config.facebook_access_token)
 
 def urldecode(value):
 	if not value:

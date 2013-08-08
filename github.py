@@ -4,6 +4,7 @@
 
 import argparse, urllib, urllib2, traceback, sys, webbrowser
 import BaseHTTPServer
+from urlparse import urlparse
 import config, util
 
 prefix = "https://api.github.com/"
@@ -49,9 +50,7 @@ def init():
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 	def do_GET(self):
-		s = self.path
-		i = s.index('?')
-		s = s[i+1:]
+		s = urlparse(self.path).query
 		result = util.urldecode(s)
 		if result['state'] == state:
 			global code

@@ -10,6 +10,7 @@ import config, util
 prefix = "https://graph.facebook.com/"
 scope = None
 
+state = "helloworld"
 code = None
 
 # You need to set your Website with Facebook Login to http://localhost:8000
@@ -18,6 +19,7 @@ def authorize(app_id, app_secret):
 	url = 'https://www.facebook.com/dialog/oauth'
 	params = {'client_id' : app_id,
 			'response_type' : 'code',
+			'state' : state,
 			'redirect_uri' : 'http://localhost:8000/'}
 	if scope:
 		params['scope'] = scope
@@ -58,8 +60,12 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			s = urlparse(self.path).query
 			result = util.urldecode(s)
 			global code
-			code = result['code']
-			self.wfile.write('Hello world')
+			if result['state'] == state:
+				code = result['code']
+				self.wfile.write('Hello world')
+			else:
+				print self.path
+				self.wfile.write(self.path)
 		except Exception:
 			print self.path
 			self.wfile.write(self.path)

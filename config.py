@@ -24,6 +24,16 @@ facebook_app_secret = "Your Facebook App Secret"
 
 facebook_access_token = None
 
+# google
+# https://code.google.com/apis/console
+# https://developers.google.com/accounts/docs/OAuth2Login
+google_client_id = "Your Google Client ID"
+google_client_secret = "Your Google client secret"
+
+google_access_token = None
+google_id_token = None
+google_refresh_token = None
+
 try:
     from config_local import *
 except ImportError:

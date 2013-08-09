@@ -33,6 +33,12 @@ def save_to_json():
 		cf['github_access_token'] = config.github_access_token
 	if config.facebook_access_token:
 		cf['facebook_access_token'] = config.facebook_access_token
+	if config.google_access_token:
+		cf['google_access_token'] = config.google_access_token
+	if config.google_id_token:
+		cf['google_id_token'] = config.google_id_token
+	if config.google_refresh_token:
+		cf['google_refresh_token'] = config.google_refresh_token
 	json.dump(cf, open(_json_file(), 'w'), indent=4)
 
 def load_from_json():
@@ -42,6 +48,9 @@ def load_from_json():
 	config.access_token_secret = cf.get('access_token_secret', config.access_token_secret)
 	config.github_access_token = cf.get('github_access_token', config.github_access_token)
 	config.facebook_access_token = cf.get('facebook_access_token', config.facebook_access_token)
+	config.google_access_token = cf.get('google_access_token', config.google_access_token)
+	config.google_id_token = cf.get('google_id_token', config.google_id_token)
+	config.google_refresh_token = cf.get('google_refresh_token', config.google_refresh_token)
 
 def urldecode(value):
 	if not value:

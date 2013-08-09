@@ -10,7 +10,7 @@ def _get_bearer_token_credentials(consumer_key, consumer_secret):
 	Bearer_token_credentials = \
 					RFC_1738_encoded_consumer_key + ':' + RFC_1738_encoded_consumer_secret
 	Base64_encoded_bearer_token_credentials = \
-					base64.encodestring(Bearer_token_credentials).replace('\n', '')
+					base64.b64encode(Bearer_token_credentials)
 	return Base64_encoded_bearer_token_credentials
 
 def get_assess_token(consumer_key, consumer_secret):

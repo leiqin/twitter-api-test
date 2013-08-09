@@ -55,7 +55,7 @@ def _oauth_signature(url, method, consumer_secret, access_token_secret, oauth, q
 		signature_key += access_token_secret
 
 	HMAC = hmac.new(signature_key, signature_base_string, hashlib.sha1)
-	oauth_signature = base64.encodestring(HMAC.digest()).replace('\n', '')
+	oauth_signature = base64.b64encode(HMAC.digest())
 	return oauth_signature
 
 def _oauth_header(oauth):

@@ -21,12 +21,10 @@ def base64urldecode(value):
 	i = len(value) % 4
 	if i != 0:
 		value += '=' * (4 - i)
-	value = value.replace('-', '+').replace('_', '/')
-	return base64.decodestring(value)
+	return base64.urlsafe_b64decode(value)
 
 def base64urlencode(value):
-	result = base64.encodestring(value).replace('\n', '')
-	result = result.replace('+', '-').replace('/', '_')
+	result = base64.urlsafe_b64encode(value)
 	if result.endswith('=='):
 		result = result[:-2]
 	if result.endswith('='):

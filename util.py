@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import config, json, os.path, urllib, sys, traceback
+import config, json, os.path, urllib, sys, traceback, re
 
 def print_response(response):
     print '%s %s' % (response.getcode(), response.msg)
@@ -14,7 +14,12 @@ def _json_file():
 
 def _load_json_file():
 	try:
+		# PS: 有时后测试的时候需要删除某条配置
+		# 如果删除了最后一条就会出现
+		# 新的最后一条后面多了一个逗号 ","
+		# 导致 json 解析出错
 		json_str = open(_json_file()).read()
+		json_str = re.sub(r',\s*}$', '\n}', json_str)
 		cf = json.loads(json_str)
 		return cf
 	except Exception:

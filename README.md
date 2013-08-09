@@ -31,13 +31,13 @@ twitter-api-test
 
 (PS: 本程序不自带翻墙功能，请使用 VPN 或其他翻墙工具)
 
-[GitHub](http://developer.github.com/)
+[GitHub](http://developer.github.com/),
 [GitHub OAuth](http://developer.github.com/v3/oauth)
 
-[Facebook](https://developers.facebook.com)
-[Graph API](https://developers.facebook.com/docs/reference/api/)
-[The Login Flow for Web (without JavaScript SDK)](https://developers.facebook.com/docs/facebook-login/login-flow-for-web-no-jssdk)
+[Facebook](https://developers.facebook.com),
+[Graph API](https://developers.facebook.com/docs/reference/api/),
+[The Login Flow for Web (without JavaScript SDK)](https://developers.facebook.com/docs/facebook-login/login-flow-for-web-no-jssdk),
 [Access Tokens](https://developers.facebook.com/docs/facebook-login/access-tokens)
 
-[Google](https://code.google.com/apis/console)
+[Google](https://code.google.com/apis/console),
 [Using OAuth 2.0 for Login](https://developers.google.com/accounts/docs/OAuth2Login)

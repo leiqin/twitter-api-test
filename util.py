@@ -14,7 +14,8 @@ def _json_file():
 
 def _load_json_file():
 	try:
-		cf = json.load(open(_json_file()))
+		json_str = open(_json_file()).read()
+		cf = json.loads(json_str)
 		return cf
 	except Exception:
 		print >>sys.stderr, 'load json file Errer'

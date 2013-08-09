@@ -3,11 +3,12 @@
 # http://developer.github.com
 
 import argparse, urllib, urllib2, traceback, sys, webbrowser, json
-import BaseHTTPServer, base64
+import BaseHTTPServer
 from urlparse import urlparse
 import config, util
 
-scope = "openid email"
+prefix = "https://www.googleapis.com/"
+scope = "openid email profile"
 
 state = "helloworld"
 code = None
@@ -96,12 +97,46 @@ parser = argparse.ArgumentParser(
 				You need to use the Client ID for installed applications \
 				or the web applications set Your site to http://localhost:8000 \
 				and your Authorized Redirect URIs to http://localhost:8000/oauth2callback')
+parser.add_argument('-i', '--id-token', action='store_true', dest='id_token',
+		help='Infomation of ID Token')
+parser.add_argument('-p', '--params', type=str, action='append', 
+		help='HTTP Params, Format name=value, you can set many times')
+parser.add_argument('-m', '--method', type=str, default='GET', 
+		help='HTTP Method, default GET')
+parser.add_argument('url', type=str, nargs='?',
+		help='URL For API, like "oauth2/v3/userinfo"')
 
 if __name__ == '__main__':
 	try:
 		args = parser.parse_args()
-		init()
-		print validate_id_token(config.google_id_token)
+		if args.id_token:
+			init()
+			print validate_id_token(config.google_id_token)
+		elif args.url:
+			url = args.url
+			if not url.startswith('https://'):
+				url = prefix + url
+			method = args.method.upper()
+			params = _get_params(args.params)
+			init()
+			params['access_token'] = config.google_access_token
+			if method == 'GET':
+				url = url + '?' + urllib.urlencode(params)
+				req = urllib2.Request(url)
+			elif method == 'POST' or method == 'PUT':
+				req = urllib2.Request(url)
+				req.data = urllib.urlencode(params)
+				req.add_header('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8')
+				req.get_method = lambda: method
+			else:
+				url = url + '?' + urllib.urlencode(params)
+				req = urllib2.Request(url)
+				req.get_method = lambda: method
+
+			response = urllib2.urlopen(req)
+			print response.read()
+		else:
+			parser.print_help()
 	except urllib2.HTTPError, e:
 		print >>sys.stderr, '%s %s' % (e.code, e.msg)
 		print >>sys.stderr, e.fp.read()

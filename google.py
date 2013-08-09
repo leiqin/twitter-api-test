@@ -4,8 +4,10 @@
 
 import argparse, urllib, urllib2, traceback, sys, webbrowser, json
 import BaseHTTPServer
+import M2Crypto
+import os.path
 from urlparse import urlparse
-import config, util
+import config, util ,jwt
 
 prefix = "https://www.googleapis.com/"
 scope = "openid email profile"
@@ -76,10 +78,30 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			print self.path
 			self.wfile.write(self.path)
 
-def validate_id_token(id_token):
+def validate_id_token_from_web(id_token):
 	url = 'https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=' + id_token
 	response = urllib2.urlopen(url)
-	return response.read()
+	result = response.read()
+	return json.loads(result)
+
+def validate_id_token(id_token):
+	def get_key(kid):
+		certs_file = os.path.join(os.path.dirname(__file__), 'google.certs')
+		if os.path.exists(certs_file):
+			certs_str = open(certs_file).read()
+		else:
+			reponse = urllib2.urlopen('https://www.googleapis.com/oauth2/v1/certs')
+			certs_str = reponse.read()
+			with open(certs_file, 'w') as f:
+				f.write(certs_str)
+		certs = json.loads(certs_str)
+		cert_str = certs[kid]
+		cert = M2Crypto.X509.load_cert_string(str(cert_str))
+		evp = cert.get_pubkey()
+		rsa = evp.get_rsa()
+		key = rsa.as_pem()
+		return key
+	return jwt.toJSON(id_token, get_key)
 
 def _get_params(arr):
 	if not arr:
@@ -111,7 +133,8 @@ if __name__ == '__main__':
 		args = parser.parse_args()
 		if args.id_token:
 			init()
-			print validate_id_token(config.google_id_token)
+			result = validate_id_token(config.google_id_token)
+			print json.dumps(result, indent=4)
 		elif args.url:
 			url = args.url
 			if not url.startswith('https://'):

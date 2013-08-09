@@ -40,4 +40,8 @@ twitter-api-test
 [Access Tokens](https://developers.facebook.com/docs/facebook-login/access-tokens)
 
 [Google](https://code.google.com/apis/console),
-[Using OAuth 2.0 for Login](https://developers.google.com/accounts/docs/OAuth2Login)
+[Using OAuth 2.0 for Login](https://developers.google.com/accounts/docs/OAuth2Login),
+
+[JSON Web Token (JWT)](http://openid.net/specs/draft-jones-json-web-token-07.html),
+[JSON Web Signature (JWS)](http://tools.ietf.org/html/draft-jones-json-web-signature-04)
+[Verifying signature in Python](http://stackoverflow.com/questions/5440550/verifying-signature-on-android-in-app-purchase-message-in-python-on-google-app-e)

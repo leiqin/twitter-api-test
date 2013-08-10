@@ -16,46 +16,46 @@ stream_resource = {
 def init(app_only=False, force=False):
 	if force:
 		if app_only:
-			config.bearer = application_only_authentication.get_assess_token(
-					config.consumer_key, config.consumer_secret)
+			config.twitter_bearer = application_only_authentication.get_assess_token(
+					config.twitter_consumer_key, config.twitter_consumer_secret)
 		else:
-			config.access_token, config.access_token_secret = \
-					oauth.authorize(config.consumer_key, config.consumer_secret)
+			config.twitter_access_token, config.twitter_access_token_secret = \
+					oauth.authorize(config.twitter_consumer_key, config.twitter_consumer_secret)
 		util.save_to_json()
 
 	if app_only:
-		if not config.bearer:
+		if not config.twitter_bearer:
 			util.load_from_json()
-		if not config.bearer:
-			config.bearer = application_only_authentication.get_assess_token(
-					config.consumer_key, config.consumer_secret)
+		if not config.twitter_bearer:
+			config.twitter_bearer = application_only_authentication.get_assess_token(
+					config.twitter_consumer_key, config.twitter_consumer_secret)
 			util.save_to_json()
 	else:
-		if not config.access_token or not config.access_token_secret:
+		if not config.twitter_access_token or not config.twitter_access_token_secret:
 			util.load_from_json()
-		if not config.access_token or not config.access_token_secret:
-			config.access_token, config.access_token_secret = \
-					oauth.authorize(config.consumer_key, config.consumer_secret)
+		if not config.twitter_access_token or not config.twitter_access_token_secret:
+			config.twitter_access_token, config.twitter_access_token_secret = \
+					oauth.authorize(config.twitter_consumer_key, config.twitter_consumer_secret)
 			util.save_to_json()
 
 def build_request(url, method, params, app_only=False):
 	if app_only:
 		if method.upper() == 'GET':
 			return application_only_authentication.build_request(url, method,
-					config.bearer, query_params=params)
+					config.twitter_bearer, query_params=params)
 		else:
 			return application_only_authentication.build_request(url, method,
-					config.bearer, body_params=params)
+					config.twitter_bearer, body_params=params)
 	else:
 		if method.upper() == 'GET':
 			return oauth.build_request(url, method,
-					config.consumer_key, config.consumer_secret,
-					config.access_token, config.access_token_secret, 
+					config.twitter_consumer_key, config.twitter_consumer_secret,
+					config.twitter_access_token, config.twitter_access_token_secret, 
 					query_params=params)
 		else:
 			return oauth.build_request(url, method,
-					config.consumer_key, config.consumer_secret,
-					config.access_token, config.access_token_secret, 
+					config.twitter_consumer_key, config.twitter_consumer_secret,
+					config.twitter_access_token, config.twitter_access_token_secret, 
 					body_params=params)
 
 parser = argparse.ArgumentParser(
@@ -71,64 +71,65 @@ parser.add_argument('-p', '--params', type=str, action='append',
 parser.add_argument('-c', '--clean', action='store_true',
 		help='Clean access_token if it exists')
 parser.add_argument('url', type=str, nargs='?',
-		help='URL for Twitter API, like "statuses/home_timeline"')
+		help='URL for Twitter API, like "statuses/home_timeline" or "account/settings"')
 
 if __name__ == '__main__':
 	args = parser.parse_args()
 	if args.clean:
 		if args.app_only:
-			config.bearer = ''
+			config.twitter_bearer = ''
 		else:
-			config.access_token = ''
-			config.access_token_secret = ''
+			config.twitter_access_token = ''
+			config.twitter_access_token_secret = ''
 		util.save_to_json()
-		sys.exit(0)
-
-	is_stream = False
-	url = args.url
-	method = args.method
-	params = None
-	app_only = args.app_only
-
-	if url in stream_resource:
-		url = stream_resource[url]
-		params = {'delimited':'length'}
-		is_stream = True
+	elif not args.url:
+		parser.print_help()
 	else:
-		if not url.startswith('https://'):
-			if url in stream_resource:
-				url = stream_resource[url]
-				is_stream = True
-			else:
-				url = prefix + url
-		if not url.endswith('.json'):
-			url = url + suffix
+		is_stream = False
+		url = args.url
+		method = args.method
+		params = None
+		app_only = args.app_only
 
-	if args.params:
-		params = {}
-		for s in args.params:
-			i = s.index('=')
-			name = s[:i]
-			value = s[i+1:]
-			params[name] = value
-
-	try:
-		init(app_only)
-		req = build_request(url, method, params, app_only)
-		response = urllib2.urlopen(req)
-		if is_stream:
-			len_str = ''
-			while True:
-				c = response.read(1)
-				if c in string.digits:
-					len_str += c
-				if len_str and c == '\n':
-					length = int(len_str)
-					len_str = ''
-					print response.read(length)
+		if url in stream_resource:
+			url = stream_resource[url]
+			params = {'delimited':'length'}
+			is_stream = True
 		else:
-			print response.read()
-	except urllib2.HTTPError, e:
-		print >>sys.stderr, '%s %s' % (e.code, e.msg)
-		print >>sys.stderr, e.fp.read()
-		traceback.print_exc()
+			if not url.startswith('https://'):
+				if url in stream_resource:
+					url = stream_resource[url]
+					is_stream = True
+				else:
+					url = prefix + url
+			if not url.endswith('.json'):
+				url = url + suffix
+
+		if args.params:
+			params = {}
+			for s in args.params:
+				i = s.index('=')
+				name = s[:i]
+				value = s[i+1:]
+				params[name] = value
+
+		try:
+			init(app_only)
+			req = build_request(url, method, params, app_only)
+			response = urllib2.urlopen(req)
+			if is_stream:
+				len_str = ''
+				while True:
+					c = response.read(1)
+					if c in string.digits:
+						len_str += c
+					if len_str and c == '\n':
+						length = int(len_str)
+						len_str = ''
+						print response.read(length)
+			else:
+				print response.read()
+		except urllib2.HTTPError, e:
+			print >>sys.stderr, '%s %s' % (e.code, e.msg)
+			print >>sys.stderr, e.fp.read()
+			traceback.print_exc()

@@ -142,7 +142,7 @@ def authorize(consumer_key, consumer_secret, input_callback=_default_input_callb
 if __name__ == '__main__':
 	import config
 	try:
-		access_token, access_token_secret = authorize(config.consumer_key, config.consumer_secret)
+		access_token, access_token_secret = authorize(config.twitter_consumer_key, config.twitter_consumer_secret)
 		print 'access_token : %s' % access_token
 		print 'access_token_secret : %s' % access_token_secret
 	except urllib2.HTTPError, e:

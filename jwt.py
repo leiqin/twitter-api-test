@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# http://openid.net/specs/draft-jones-json-web-token-07.html
-# http://tools.ietf.org/html/draft-jones-json-web-signature-04
 """
+http://openid.net/specs/draft-jones-json-web-token-07.html
+http://tools.ietf.org/html/draft-jones-json-web-signature-04
+
 支持 plaintext 和 signed (JWS) 的 JWT
 不支持嵌套
 JWS 的算法支持：HS256, HS384, HS512, RS256, RS384, RS512

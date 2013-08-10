@@ -85,7 +85,8 @@ parser.add_argument('-p', '--params', type=str, action='append',
 				like "-p type=all -p sort=updated"')
 parser.add_argument('-c', '--clean', action='store_true',
 		help='Clean access_token if it exists')
-parser.add_argument('url', type=str,nargs='?', help='URL For API, like "user/repos"')
+parser.add_argument('url', type=str,nargs='?', 
+		help='URL For API, like "user/repos" or "user"')
 
 if __name__ == '__main__':
 	try:
@@ -93,16 +94,18 @@ if __name__ == '__main__':
 		if args.clean:
 			config.github_access_token = ''
 			util.save_to_json()
-			sys.exit(0)
-		url = args.url
-		if not url.startswith('https://'):
-			url = prefix + url
-		params = _get_params(args.params)
-		init()
-		params['access_token'] = config.github_access_token
-		url = url + '?' + urllib.urlencode(params)
-		response = urllib2.urlopen(url)
-		print response.read()
+		elif args.url:
+			url = args.url
+			if not url.startswith('https://'):
+				url = prefix + url
+			params = _get_params(args.params)
+			init()
+			params['access_token'] = config.github_access_token
+			url = url + '?' + urllib.urlencode(params)
+			response = urllib2.urlopen(url)
+			print response.read()
+		else:
+			parser.print_help()
 	except urllib2.HTTPError, e:
 		print >>sys.stderr, '%s %s' % (e.code, e.msg)
 		print >>sys.stderr, e.fp.read()

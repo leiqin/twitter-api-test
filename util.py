@@ -2,7 +2,7 @@
 
 import config, json, os.path, urllib, sys, traceback, re
 
-saved_config = ['bearer', 'access_token', 'access_token_secret',\
+saved_config = ['twitter_bearer', 'twitter_access_token', 'twitter_access_token_secret',\
 		'github_access_token', \
 		'facebook_access_token', \
 		'google_access_token', 'google_id_token', 'google_refresh_token']

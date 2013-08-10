@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-consumer_key = "Your Consumer key"
-consumer_secret = "Your Consumer secret"
+twitter_consumer_key = "Your Consumer key"
+twitter_consumer_secret = "Your Consumer secret"
 # oauth token
 # https://dev.twitter.com/docs/auth/oauth
-access_token = None
-access_token_secret = None
+twitter_access_token = None
+twitter_access_token_secret = None
 # application_only_authentication token 
 # https://dev.twitter.com/docs/auth/application-only-auth
-bearer = None
+twitter_bearer = None
 
 # github
 # http://developer.github.com

@@ -100,29 +100,31 @@ if __name__ == '__main__':
 		if args.clean:
 			config.facebook_access_token = ''
 			util.save_to_json()
-			sys.exit(0)
-		url = args.url
-		method = args.method.upper()
-		if not url.startswith('https://'):
-			url = prefix + url
-		params = _get_params(args.params)
-		init()
-		params['access_token'] = config.facebook_access_token
-		if method == 'GET':
-			url = url + '?' + urllib.urlencode(params)
-			req = urllib2.Request(url)
-		elif method == 'POST' or method == 'PUT':
-			req = urllib2.Request(url)
-			req.data = urllib.urlencode(params)
-			req.add_header('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8')
-			req.get_method = lambda: method
-		else:
-			url = url + '?' + urllib.urlencode(params)
-			req = urllib2.Request(url)
-			req.get_method = lambda: method
+		elif args.url:
+			url = args.url
+			method = args.method.upper()
+			if not url.startswith('https://'):
+				url = prefix + url
+			params = _get_params(args.params)
+			init()
+			params['access_token'] = config.facebook_access_token
+			if method == 'GET':
+				url = url + '?' + urllib.urlencode(params)
+				req = urllib2.Request(url)
+			elif method == 'POST' or method == 'PUT':
+				req = urllib2.Request(url)
+				req.data = urllib.urlencode(params)
+				req.add_header('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8')
+				req.get_method = lambda: method
+			else:
+				url = url + '?' + urllib.urlencode(params)
+				req = urllib2.Request(url)
+				req.get_method = lambda: method
 
-		response = urllib2.urlopen(req)
-		print response.read()
+			response = urllib2.urlopen(req)
+			print response.read()
+		else:
+			parser.print_help()
 	except urllib2.HTTPError, e:
 		print >>sys.stderr, '%s %s' % (e.code, e.msg)
 		print >>sys.stderr, e.fp.read()

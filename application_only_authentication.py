@@ -57,9 +57,9 @@ def build_request(url, method, bearer,
 if __name__ == '__main__':
 	import config
 	try:
-		access_token = get_assess_token(config.consumer_key, config.consumer_secret)
+		access_token = get_assess_token(config.twitter_consumer_key, config.twitter_consumer_secret)
 		print 'access_token: ' + access_token
-		#invalidateg_bearer_token(config.consumer_key, config.consumer_secret, access_token)
+		#invalidateg_bearer_token(config.twitter_consumer_key, config.twitter_consumer_secret, access_token)
 
 		req = build_request( 'https://api.twitter.com/1.1/statuses/user_timeline.json', 
 				'GET', access_token, query_params={'count':100,'screen_name':'twitterapi'})

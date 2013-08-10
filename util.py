@@ -2,6 +2,11 @@
 
 import config, json, os.path, urllib, sys, traceback, re
 
+saved_config = ['bearer', 'access_token', 'access_token_secret',\
+		'github_access_token', \
+		'facebook_access_token', \
+		'google_access_token', 'google_id_token', 'google_refresh_token']
+
 def print_response(response):
     print '%s %s' % (response.getcode(), response.msg)
     print response.info()
@@ -27,36 +32,31 @@ def _load_json_file():
 		traceback.print_exc()
 		return {}
 
+def _set_config(cf, name):
+	if not hasattr(config, name):
+		print >>sys.stderr, 'Unknow config %s' % name
+		return
+	value = getattr(config, name)
+	if value == '' and name in cf:
+		del cf[name]
+	if value:
+		cf[name] = value
+
+def _load_config(cf, name):
+	value = cf.get(name, None)
+	if value:
+		setattr(config, name, value)
+
 def save_to_json():
 	cf = _load_json_file()
-	if config.bearer:
-		cf['bearer'] = config.bearer
-	if config.access_token:
-		cf['access_token'] = config.access_token
-	if config.access_token_secret:
-		cf['access_token_secret'] = config.access_token_secret
-	if config.github_access_token:
-		cf['github_access_token'] = config.github_access_token
-	if config.facebook_access_token:
-		cf['facebook_access_token'] = config.facebook_access_token
-	if config.google_access_token:
-		cf['google_access_token'] = config.google_access_token
-	if config.google_id_token:
-		cf['google_id_token'] = config.google_id_token
-	if config.google_refresh_token:
-		cf['google_refresh_token'] = config.google_refresh_token
+	for name in saved_config:
+		_set_config(cf, name)
 	json.dump(cf, open(_json_file(), 'w'), indent=4)
 
 def load_from_json():
 	cf = _load_json_file()
-	config.bearer = cf.get('bearer', config.bearer)
-	config.access_token = cf.get('access_token', config.access_token)
-	config.access_token_secret = cf.get('access_token_secret', config.access_token_secret)
-	config.github_access_token = cf.get('github_access_token', config.github_access_token)
-	config.facebook_access_token = cf.get('facebook_access_token', config.facebook_access_token)
-	config.google_access_token = cf.get('google_access_token', config.google_access_token)
-	config.google_id_token = cf.get('google_id_token', config.google_id_token)
-	config.google_refresh_token = cf.get('google_refresh_token', config.google_refresh_token)
+	for name in saved_config:
+		_load_config(cf, name)
 
 def urldecode(value):
 	if not value:

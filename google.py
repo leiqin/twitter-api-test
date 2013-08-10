@@ -120,11 +120,15 @@ parser = argparse.ArgumentParser(
 				or the web applications set Your site to http://localhost:8000 \
 				and your Authorized Redirect URIs to http://localhost:8000/oauth2callback')
 parser.add_argument('-i', '--id-token', action='store_true', dest='id_token',
-		help='Infomation of ID Token')
+		help='Print the Infomation of ID Token')
+parser.add_argument('-w', '--id-token-from-web', action='store_true', dest='id_token_from_web',
+		help='Get the Infomation of ID Token from Web')
 parser.add_argument('-p', '--params', type=str, action='append', 
 		help='HTTP Params, Format name=value, you can set many times')
 parser.add_argument('-m', '--method', type=str, default='GET', 
 		help='HTTP Method, default GET')
+parser.add_argument('-c', '--clean', action='store_true',
+		help='Clean access_token if it exists')
 parser.add_argument('url', type=str, nargs='?',
 		help='URL For API, like "oauth2/v3/userinfo"')
 
@@ -135,6 +139,15 @@ if __name__ == '__main__':
 			init()
 			result = validate_id_token(config.google_id_token)
 			print json.dumps(result, indent=4)
+		elif args.id_token_from_web:
+			init()
+			result = validate_id_token_from_web(config.google_id_token)
+			print json.dumps(result, indent=4)
+		elif args.clean:
+			config.google_access_token = ''
+			config.google_id_token = ''
+			config.google_refresh_token = ''
+			util.save_to_json()
 		elif args.url:
 			url = args.url
 			if not url.startswith('https://'):

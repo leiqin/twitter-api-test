@@ -83,11 +83,17 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-p', '--params', type=str, action='append', 
 		help='HTTP Params, Format name=value, you can set many times, \
 				like "-p type=all -p sort=updated"')
-parser.add_argument('url', type=str, help='URL For API, like "user/repos"')
+parser.add_argument('-c', '--clean', action='store_true',
+		help='Clean access_token if it exists')
+parser.add_argument('url', type=str,nargs='?', help='URL For API, like "user/repos"')
 
 if __name__ == '__main__':
 	try:
 		args = parser.parse_args()
+		if args.clean:
+			config.github_access_token = ''
+			util.save_to_json()
+			sys.exit(0)
 		url = args.url
 		if not url.startswith('https://'):
 			url = prefix + url

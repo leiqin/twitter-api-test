@@ -90,11 +90,17 @@ parser.add_argument('-p', '--params', type=str, action='append',
 		help='HTTP Params, Format name=value, you can set many times')
 parser.add_argument('-m', '--method', type=str, default='GET', 
 		help='HTTP Method, default GET')
-parser.add_argument('url', type=str, help='URL For API, like "me"')
+parser.add_argument('-c', '--clean', action='store_true',
+		help='Clean access_token if it exists')
+parser.add_argument('url', type=str, nargs='?', help='URL For API, like "me"')
 
 if __name__ == '__main__':
 	try:
 		args = parser.parse_args()
+		if args.clean:
+			config.facebook_access_token = ''
+			util.save_to_json()
+			sys.exit(0)
 		url = args.url
 		method = args.method.upper()
 		if not url.startswith('https://'):

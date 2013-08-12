@@ -65,6 +65,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 	def do_GET(self):
 		try:
+			self.send_response(200)
+			self.send_header('Content-Type', 'text/plain')
+			self.end_headers()
 			s = urlparse(self.path).query
 			result = util.urldecode(s)
 			global code

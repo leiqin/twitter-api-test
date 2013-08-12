@@ -6,12 +6,19 @@
 from openid.consumer import consumer
 from openid.store import memstore
 
-import urllib, urllib2, webbrowser, json, argparse
+import urllib, webbrowser, json, argparse
+import traceback, sys
 import BaseHTTPServer
 from urlparse import urlparse
 import util
 
 port = 8000
+return_to = 'http://localhost:' + str(port)
+realm = None
+
+session = {}
+store = memstore.MemoryStore()
+openid_consumer = consumer.Consumer(session, store)
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
@@ -21,9 +28,6 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		s = urlparse(self.path).query
 		result = util.urldecode(s)
 
-		session = {}
-		store = memstore.MemoryStore()
-		openid_consumer = consumer.Consumer(session, store)
 		info = openid_consumer.complete(result, url)
 
 		display_identifier = info.getDisplayIdentifier()
@@ -36,11 +40,6 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			fmt = "Verification of %s failed: %s"
 			message = fmt % (display_identifier, info.message)
 		elif info.status == consumer.SUCCESS:
-			# Success means that the transaction completed without
-			# error. If info is None, it means that the user cancelled
-			# the verification.
-			css_class = 'alert'
-
 			# This is a successful verification attempt. If this
 			# was a real application, we would do our login,
 			# comment posting, etc. here.
@@ -70,6 +69,8 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			# information in a log.
 			message = 'Verification failed.'
 
+		print
+		print
 		print message
 		email = None
 		for key in result:
@@ -80,6 +81,8 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				break
 		if email:
 			print 'Your Email is : %s' % email
+		print
+		print
 
 		result['message'] = message
 		self.send_response(200)
@@ -87,16 +90,18 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		self.end_headers()
 		self.wfile.write(json.dumps(result, indent=4))
 
-endpoint = 'https://www.google.com/accounts/o8/ud'
+google_endpoint = 'https://www.google.com/accounts/o8/ud'
 params = {
-		'openid.return_to' : 'http://localhost:' + str(port),
+		'openid.return_to' : return_to,
 		'openid.mode' : 'checkid_setup',
 		'openid.ns' : 'http://specs.openid.net/auth/2.0',
 		'openid.claimed_id' : 'http://specs.openid.net/auth/2.0/identifier_select',
 		'openid.identity' : 'http://specs.openid.net/auth/2.0/identifier_select',
 		}
+if realm:
+	params['openid.realm'] = realm
 
-google_exchange = {
+email_exchange = {
 		'openid.ns.ax' : 'http://openid.net/srv/ax/1.0',
 		'openid.ax.mode' : 'fetch_request',
 		'openid.ax.type.email' : 'http://axschema.org/contact/email',
@@ -106,20 +111,56 @@ google_exchange = {
 parser = argparse.ArgumentParser(description='A Tool For try Google OpenID \
 		https://developers.google.com/accounts/docs/OpenID')
 parser.add_argument('-e', '--email', action='store_true',
-		help='Get Google Email Address')
+		help='Get Email Address')
+parser.add_argument('-g', '--login-with-google', action='store_true',
+		dest='login_with_google', help='Login with Google')
 parser.add_argument('openid', type=str, nargs='?', 
-		help="Your OpenID, if you don't privode this ,will use Goolge")
+		help="Your OpenID, you can provide your OpenID or set -g for login with Google")
 
 if __name__ == '__main__':
 	args = parser.parse_args()
+	url = None
 
 	if args.openid:
-		pass
-	else:
-		if args.email:
-			params.update(google_exchange)
+		openid_url = args.openid
+		# Copy from https://github.com/openid/python-openid/blob/master/examples/consumer.py
+		try:
+			request = openid_consumer.begin(openid_url)
+		except consumer.DiscoveryFailure, exc:
+			fetch_error_string = 'Error in discovery: %s' % str(exc[0])
+			print fetch_error_string
+			traceback.print_exc()
+		else:
+			if request is None:
+				msg = 'No OpenID services found for "%s"' % openid_url
+				print msg
+			else:
+				# Then, ask the library to begin the authorization.
+				# Here we find out the identity server that will verify the
+				# user's identity, and get a token that allows us to
+				# communicate securely with the identity server.
 
-	url = endpoint + '?' + urllib.urlencode(params)
+				if realm:
+					trust_root = realm
+				else:
+					pr = urlparse(return_to)
+					trust_root = pr.scheme + '://' + pr.netloc
+				redirect_url = request.redirectURL(
+					trust_root, return_to, False)
+				url = redirect_url
+				if args.email:
+					url += '&' + urllib.urlencode(email_exchange)
+	elif args.login_with_google:
+		if args.email:
+			params.update(email_exchange)
+		url = google_endpoint + '?' + urllib.urlencode(params)
+	else:
+		parser.print_help()
+		sys.exit(1)
+	
+	if not url:
+		raise Exception('Authenticate url is None')
+	print url
 
 	print 'Start Server, Please wait ...'
 	httpd = BaseHTTPServer.HTTPServer(('', port), RequestHandler)

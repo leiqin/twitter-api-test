@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import argparse, urllib2, sys, traceback, string
+import argparse, urllib2, sys, traceback, string, os.path
 import config, oauth, util, application_only_authentication
 
 prefix = 'https://api.twitter.com/1.1/'
@@ -58,8 +58,18 @@ def build_request(url, method, params, app_only=False):
 					config.twitter_access_token, config.twitter_access_token_secret, 
 					body_params=params)
 
-parser = argparse.ArgumentParser(
-		description='A Tool For Test Twitter API https://dev.twitter.com/docs/api/1.1')
+filename = os.path.basename(__file__)
+
+description = """
+A Tool For Test Twitter API https://dev.twitter.com/docs/api/1.1
+"""
+
+usage="""
+%(filename)s [-a] [-m method] [-p name=value]... url
+%(filename)s -c
+""" % {'filename' : filename}
+
+parser = argparse.ArgumentParser(description=description, usage=usage)
 
 parser.add_argument('-a', '--app-only', action='store_true', dest='app_only',
 		help="use Application-only authentication")

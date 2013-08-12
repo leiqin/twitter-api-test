@@ -3,7 +3,7 @@
 # http://developer.github.com
 
 import argparse, urllib, urllib2, traceback, sys, webbrowser
-import BaseHTTPServer
+import BaseHTTPServer, os.path
 from urlparse import urlparse
 import config, util
 
@@ -79,10 +79,20 @@ def _get_params(arr):
 		params[name] = value
 	return params
 
-parser = argparse.ArgumentParser(
-		description='A Tool For test GitHub API http://developer.github.com/ , \
-				you need to set the application\'s callback URL to \
-				"http://localhost:8000" or set the github_access_token in config.py')
+filename = os.path.basename(__file__)
+
+description = """
+A Tool For test GitHub API http://developer.github.com/ , 
+you need to set the application's callback URL to 
+"http://localhost:8000" or set the github_access_token in config.py
+"""
+
+usage="""
+%(filename)s [-p name=value]... url
+%(filename)s -c
+""" % {'filename' : filename}
+
+parser = argparse.ArgumentParser(description=description, usage=usage)
 parser.add_argument('-p', '--params', type=str, action='append', 
 		help='HTTP Params, Format name=value, you can set many times, \
 				like "-p type=all -p sort=updated"')

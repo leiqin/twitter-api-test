@@ -3,7 +3,7 @@
 # http://developer.github.com
 
 import argparse, urllib, urllib2, traceback, sys, webbrowser, json
-import BaseHTTPServer
+import BaseHTTPServer, os.path
 import M2Crypto
 import os.path
 from urlparse import urlparse
@@ -117,11 +117,24 @@ def _get_params(arr):
 		params[name] = value
 	return params
 
-parser = argparse.ArgumentParser(
-		description='A Tool For test Google API \
-				You need to use the Client ID for installed applications \
-				or the web applications set Your site to http://localhost:8000 \
-				and your Authorized Redirect URIs to http://localhost:8000/oauth2callback')
+filename = os.path.basename(__file__)
+
+description = """
+A Tool For test Google API . 
+You need to use the Client ID for installed applications 
+or the web applications set Your site to http://localhost:8000 
+and your Authorized Redirect URIs to 
+http://localhost:8000/oauth2callback
+"""
+
+usage="""
+%(filename)s [-m method] [-p name=value]... url
+%(filename)s -i
+%(filename)s -w
+%(filename)s -c
+""" % {'filename' : filename}
+
+parser = argparse.ArgumentParser(description=description, usage=usage)
 parser.add_argument('-i', '--id-token', action='store_true', dest='id_token',
 		help='Print the Infomation of ID Token')
 parser.add_argument('-w', '--id-token-from-web', action='store_true', dest='id_token_from_web',

@@ -3,7 +3,7 @@
 # http://developer.github.com
 
 import argparse, urllib, urllib2, traceback, sys, webbrowser
-import BaseHTTPServer
+import BaseHTTPServer, os.path
 from urlparse import urlparse
 import config, util
 
@@ -84,11 +84,22 @@ def _get_params(arr):
 		params[name] = value
 	return params
 
-parser = argparse.ArgumentParser(
-		description='A Tool For test Facebook API \
-				https://developers.facebook.com/docs/reference/api , \
-				You need to set your Website with Facebook Login to \
-				"http://localhost:8000" and App Domains to "localhost"') 
+filename = os.path.basename(__file__)
+
+description = """
+A Tool For test Facebook API 
+https://developers.facebook.com/docs/reference/api ,
+You need to set your Website with Facebook Login to 
+"http://localhost:8000" and App Domains to "localhost"
+"""
+
+usage="""
+%(filename)s [-m method] [-p name=value]... url
+%(filename)s -c
+""" % {'filename' : filename}
+
+
+parser = argparse.ArgumentParser(description=description, usage=usage)
 parser.add_argument('-p', '--params', type=str, action='append', 
 		help='HTTP Params, Format name=value, you can set many times')
 parser.add_argument('-m', '--method', type=str, default='GET', 

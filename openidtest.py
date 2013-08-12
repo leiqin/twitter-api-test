@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 # https://developers.google.com/accounts/docs/OpenID
 # http://janrain.com/openid-enabled/
+# https://github.com/openid/python-openid
 
 from openid.consumer import consumer
 from openid.store import memstore
 
 import urllib, webbrowser, json, argparse
-import traceback, sys
+import traceback, sys, os.path
 import BaseHTTPServer
 from urlparse import urlparse
 import util
@@ -108,8 +109,19 @@ email_exchange = {
 		'openid.ax.required' : 'email',
 		}
 
-parser = argparse.ArgumentParser(description='A Tool For try Google OpenID \
-		https://developers.google.com/accounts/docs/OpenID')
+filename = os.path.basename(__file__)
+
+description = """
+A Tool For try Google OpenID https://developers.google.com/accounts/docs/OpenID .
+Need install python-openid https://github.com/openid/python-openid
+"""
+
+usage="""
+%(filename)s [-e] openid
+%(filename)s [-e] -g
+""" % {'filename' : filename}
+
+parser = argparse.ArgumentParser(description=description, usage=usage)
 parser.add_argument('-e', '--email', action='store_true',
 		help='Get Email Address')
 parser.add_argument('-g', '--login-with-google', action='store_true',
@@ -146,7 +158,7 @@ if __name__ == '__main__':
 					pr = urlparse(return_to)
 					trust_root = pr.scheme + '://' + pr.netloc
 				redirect_url = request.redirectURL(
-					trust_root, return_to, False)
+					trust_root, return_to, immediate=False)
 				url = redirect_url
 				if args.email:
 					url += '&' + urllib.urlencode(email_exchange)

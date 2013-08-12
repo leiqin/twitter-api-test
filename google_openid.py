@@ -6,7 +6,7 @@
 from openid.consumer import consumer
 from openid.store import memstore
 
-import urllib, urllib2, webbrowser, json
+import urllib, urllib2, webbrowser, json, argparse
 import BaseHTTPServer
 from urlparse import urlparse
 import util
@@ -103,8 +103,21 @@ google_exchange = {
 		'openid.ax.required' : 'email',
 		}
 
+parser = argparse.ArgumentParser(description='A Tool For try Google OpenID \
+		https://developers.google.com/accounts/docs/OpenID')
+parser.add_argument('-e', '--email', action='store_true',
+		help='Get Google Email Address')
+parser.add_argument('openid', type=str, nargs='?', 
+		help="Your OpenID, if you don't privode this ,will use Goolge")
+
 if __name__ == '__main__':
-	params.update(google_exchange)
+	args = parser.parse_args()
+
+	if args.openid:
+		pass
+	else:
+		if args.email:
+			params.update(google_exchange)
 
 	url = endpoint + '?' + urllib.urlencode(params)
 

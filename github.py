@@ -88,7 +88,7 @@ parser.add_argument('-p', '--params', type=str, action='append',
 				like "-p type=all -p sort=updated"')
 parser.add_argument('-c', '--clean', action='store_true',
 		help='Clean access_token if it exists')
-parser.add_argument('url', type=str,nargs='?', 
+parser.add_argument('url', type=str, nargs='?', 
 		help='URL For API, like "user/repos" or "user"')
 
 if __name__ == '__main__':

@@ -6,16 +6,21 @@
 
 from openid.consumer import consumer
 from openid.store import memstore
+from openid.consumer import discover
 
 import urllib, webbrowser, json, argparse
-import traceback, sys, os.path
+import traceback, sys, os.path, cgitb
 import BaseHTTPServer
 from urlparse import urlparse
 import util
 
+google_endpoint_url = 'https://www.google.com/accounts/o8/ud'
 port = 8000
 return_to = 'http://localhost:' + str(port)
 realm = None
+if not realm:
+	_pr = urlparse(return_to)
+	realm = _pr.scheme + '://' + _pr.netloc
 
 session = {}
 store = memstore.MemoryStore()
@@ -24,90 +29,77 @@ openid_consumer = consumer.Consumer(session, store)
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 	def do_GET(self):
-		host = self.headers.get('Host')
-		url = 'http://' + host + self.path
-		s = urlparse(self.path).query
-		result = util.urldecode(s)
+		try:
+			host = self.headers.get('Host')
+			url = 'http://' + host + self.path
+			s = urlparse(self.path).query
+			result = util.urldecode(s)
 
-		info = openid_consumer.complete(result, url)
+			info = openid_consumer.complete(result, url)
 
-		display_identifier = info.getDisplayIdentifier()
+			display_identifier = info.getDisplayIdentifier()
 
-		# Copy from https://github.com/openid/python-openid/blob/master/examples/consumer.py
-		if info.status == consumer.FAILURE and display_identifier:
-			# In the case of failure, if info is non-None, it is the
-			# URL that we were verifying. We include it in the error
-			# message to help the user figure out what happened.
-			fmt = "Verification of %s failed: %s"
-			message = fmt % (display_identifier, info.message)
-		elif info.status == consumer.SUCCESS:
-			# This is a successful verification attempt. If this
-			# was a real application, we would do our login,
-			# comment posting, etc. here.
-			fmt = "You have successfully verified %s as your identity."
-			message = fmt % (display_identifier,)
-			if info.endpoint.canonicalID:
-				# You should authorize i-name users by their canonicalID,
-				# rather than their more human-friendly identifiers.  That
-				# way their account with you is not compromised if their
-				# i-name registration expires and is bought by someone else.
-				message += ("  This is an i-name, and its persistent ID is %s"
-							% (info.endpoint.canonicalID,))
-		elif info.status == consumer.CANCEL:
-			# cancelled
-			message = 'Verification cancelled'
-		elif info.status == consumer.SETUP_NEEDED:
-			if info.setup_url:
-				message = 'Setup needed : %s' % (info.setup_url,)
+			# Copy from https://github.com/openid/python-openid/blob/master/examples/consumer.py
+			if info.status == consumer.FAILURE and display_identifier:
+				# In the case of failure, if info is non-None, it is the
+				# URL that we were verifying. We include it in the error
+				# message to help the user figure out what happened.
+				fmt = "Verification of %s failed: %s"
+				message = fmt % (display_identifier, info.message)
+			elif info.status == consumer.SUCCESS:
+				# This is a successful verification attempt. If this
+				# was a real application, we would do our login,
+				# comment posting, etc. here.
+				fmt = "You have successfully verified %s as your identity."
+				message = fmt % (display_identifier,)
+				if info.endpoint.canonicalID:
+					# You should authorize i-name users by their canonicalID,
+					# rather than their more human-friendly identifiers.  That
+					# way their account with you is not compromised if their
+					# i-name registration expires and is bought by someone else.
+					message += ("  This is an i-name, and its persistent ID is %s"
+								% (info.endpoint.canonicalID,))
+			elif info.status == consumer.CANCEL:
+				# cancelled
+				message = 'Verification cancelled'
+			elif info.status == consumer.SETUP_NEEDED:
+				if info.setup_url:
+					message = 'Setup needed : %s' % (info.setup_url,)
+				else:
+					# This means auth didn't succeed, but you're welcome to try
+					# non-immediate mode.
+					message = 'Setup needed'
 			else:
-				# This means auth didn't succeed, but you're welcome to try
-				# non-immediate mode.
-				message = 'Setup needed'
-		else:
-			# Either we don't understand the code or there is no
-			# openid_url included with the error. Give a generic
-			# failure message. The library should supply debug
-			# information in a log.
-			message = 'Verification failed.'
+				# Either we don't understand the code or there is no
+				# openid_url included with the error. Give a generic
+				# failure message. The library should supply debug
+				# information in a log.
+				message = 'Verification failed.'
 
-		print
-		print
-		print message
-		email = None
-		for key in result:
-			value = result[key]
-			if value == 'http://axschema.org/contact/email':
-				email_key = key.replace('type', 'value')
-				email = result[email_key]
-				break
-		if email:
-			print 'Your Email is : %s' % email
-		print
-		print
+			print
+			print
+			print message
+			email = None
+			email_value_key = ('http://openid.net/srv/ax/1.0', 'value.email')
+			if info.status == consumer.SUCCESS and email_value_key in info.message.args:
+				email = info.message.args[email_value_key]
+					
+			if email:
+				print 'Your Email is : %s' % email
+			print
+			print
 
-		result['message'] = message
-		self.send_response(200)
-		self.send_header('Content-Type', 'application/json')
-		self.end_headers()
-		self.wfile.write(json.dumps(result, indent=4))
-
-google_endpoint = 'https://www.google.com/accounts/o8/ud'
-params = {
-		'openid.return_to' : return_to,
-		'openid.mode' : 'checkid_setup',
-		'openid.ns' : 'http://specs.openid.net/auth/2.0',
-		'openid.claimed_id' : 'http://specs.openid.net/auth/2.0/identifier_select',
-		'openid.identity' : 'http://specs.openid.net/auth/2.0/identifier_select',
-		}
-if realm:
-	params['openid.realm'] = realm
-
-email_exchange = {
-		'openid.ns.ax' : 'http://openid.net/srv/ax/1.0',
-		'openid.ax.mode' : 'fetch_request',
-		'openid.ax.type.email' : 'http://axschema.org/contact/email',
-		'openid.ax.required' : 'email',
-		}
+			self.send_response(200)
+			self.send_header('Content-Type', 'application/json')
+			self.end_headers()
+			self.wfile.write(json.dumps(result, indent=4))
+		except (KeyboardInterrupt, SystemExit):
+			raise
+		except:
+			self.send_response(500)
+			self.send_header('Content-type', 'text/html')
+			self.end_headers()
+			self.wfile.write(cgitb.html(sys.exc_info(), context=10))
 
 filename = os.path.basename(__file__)
 
@@ -151,28 +143,24 @@ if __name__ == '__main__':
 				# Here we find out the identity server that will verify the
 				# user's identity, and get a token that allows us to
 				# communicate securely with the identity server.
-
-				if realm:
-					trust_root = realm
-				else:
-					pr = urlparse(return_to)
-					trust_root = pr.scheme + '://' + pr.netloc
-				redirect_url = request.redirectURL(
-					trust_root, return_to, immediate=False)
-				url = redirect_url
-				if args.email:
-					url += '&' + urllib.urlencode(email_exchange)
+				
+				#trust_root = realm
+				#url = request.redirectURL(trust_root, return_to, immediate=False)
+				pass
 	elif args.login_with_google:
-		if args.email:
-			params.update(email_exchange)
-		url = google_endpoint + '?' + urllib.urlencode(params)
+		google_endpoint = discover.OpenIDServiceEndpoint.fromOPEndpointURL(google_endpoint_url)
+		request = openid_consumer.beginWithoutDiscovery(google_endpoint)
 	else:
 		parser.print_help()
 		sys.exit(1)
 	
+	if args.email:
+		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'mode', 'fetch_request')
+		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'type.email', 'http://axschema.org/contact/email')
+		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'required', 'email')
+	url = request.redirectURL(realm, return_to, immediate=False)
 	if not url:
 		raise Exception('Authenticate url is None')
-	print url
 
 	print 'Start Server, Please wait ...'
 	httpd = BaseHTTPServer.HTTPServer(('', port), RequestHandler)

@@ -10,7 +10,7 @@ saved_config = ['twitter_bearer', 'twitter_access_token', 'twitter_access_token_
 def pprint(value):
 	try:
 		obj = json.loads(value)
-		print json.dumps(obj, indent=4)
+		print json.dumps(obj, indent=4, ensure_ascii=False)
 	except Exception:
 		print value
 

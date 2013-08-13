@@ -7,11 +7,12 @@ saved_config = ['twitter_bearer', 'twitter_access_token', 'twitter_access_token_
 		'facebook_access_token', \
 		'google_access_token', 'google_id_token', 'google_refresh_token']
 
-def print_response(response):
-    print '%s %s' % (response.getcode(), response.msg)
-    print response.info()
-    print 
-    print response.read()
+def pprint(value):
+	try:
+		obj = json.loads(value)
+		print json.dumps(obj, indent=4)
+	except Exception:
+		print value
 
 def _json_file():
 	d = os.path.dirname(__file__)

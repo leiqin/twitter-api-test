@@ -120,7 +120,7 @@ if __name__ == '__main__':
 			params['access_token'] = config.github_access_token
 			url = url + '?' + urllib.urlencode(params)
 			response = urllib2.urlopen(url)
-			print response.read()
+			util.pprint(response.read())
 		else:
 			parser.print_help()
 	except urllib2.HTTPError, e:

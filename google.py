@@ -189,7 +189,7 @@ if __name__ == '__main__':
 				req.get_method = lambda: method
 
 			response = urllib2.urlopen(req)
-			print response.read()
+			util.pprint(response.read())
 		else:
 			parser.print_help()
 	except urllib2.HTTPError, e:

@@ -136,9 +136,9 @@ if __name__ == '__main__':
 					if len_str and c == '\n':
 						length = int(len_str)
 						len_str = ''
-						print response.read(length)
+						util.pprint(response.read(length))
 			else:
-				print response.read()
+				util.pprint(response.read())
 		except urllib2.HTTPError, e:
 			print >>sys.stderr, '%s %s' % (e.code, e.msg)
 			print >>sys.stderr, e.fp.read()

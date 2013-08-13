@@ -3,9 +3,8 @@
 # http://developer.github.com
 
 import argparse, urllib, urllib2, traceback, sys, webbrowser, json
-import BaseHTTPServer, os.path
+import BaseHTTPServer, os.path, cgitb
 import M2Crypto
-import os.path
 from urlparse import urlparse
 import config, util ,jwt
 
@@ -77,9 +76,13 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			else:
 				print self.path
 				self.wfile.write(self.path)
-		except Exception:
-			print self.path
-			self.wfile.write(self.path)
+		except (KeyboardInterrupt, SystemExit):
+			raise
+		except:
+			self.send_response(500)
+			self.send_header('Content-type', 'text/html')
+			self.end_headers()
+			self.wfile.write(cgitb.html(sys.exc_info(), context=10))
 
 def validate_id_token_from_web(id_token):
 	url = 'https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=' + id_token

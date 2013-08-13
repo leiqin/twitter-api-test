@@ -8,7 +8,7 @@ from openid.consumer import consumer
 from openid.store import memstore
 from openid.consumer import discover
 
-import urllib, webbrowser, json, argparse
+import webbrowser, json, argparse
 import traceback, sys, os.path, cgitb
 import BaseHTTPServer
 from urlparse import urlparse

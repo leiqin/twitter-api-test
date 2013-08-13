@@ -3,7 +3,7 @@
 # http://developer.github.com
 
 import argparse, urllib, urllib2, traceback, sys, webbrowser
-import BaseHTTPServer, os.path
+import BaseHTTPServer, os.path, cgitb
 from urlparse import urlparse
 import config, util
 
@@ -69,9 +69,13 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			else:
 				print self.path
 				self.wfile.write(self.path)
-		except Exception:
-			print self.path
-			self.wfile.write(self.path)
+		except (KeyboardInterrupt, SystemExit):
+			raise
+		except:
+			self.send_response(500)
+			self.send_header('Content-type', 'text/html')
+			self.end_headers()
+			self.wfile.write(cgitb.html(sys.exc_info(), context=10))
 
 def _get_params(arr):
 	if not arr:

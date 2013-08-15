@@ -34,6 +34,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			url = 'http://' + host + self.path
 			s = urlparse(self.path).query
 			result = util.urldecode(s)
+			for key in result:
+				value = result[key]
+				result[key] = value.decode('utf-8')
 
 			info = openid_consumer.complete(result, url)
 
@@ -79,13 +82,27 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			print
 			print
 			print message
-			email = None
 			email_value_key = ('http://openid.net/srv/ax/1.0', 'value.email')
-			if info.status == consumer.SUCCESS and email_value_key in info.message.args:
-				email = info.message.args[email_value_key]
-					
-			if email:
-				print 'Your Email is : %s' % email
+			firstname_value_key = ('http://openid.net/srv/ax/1.0', 'value.firstname')
+			lastname_value_key = ('http://openid.net/srv/ax/1.0', 'value.lastname')
+			country_value_key = ('http://openid.net/srv/ax/1.0', 'value.country')
+			language_value_key = ('http://openid.net/srv/ax/1.0', 'value.language')
+			if info.status == consumer.SUCCESS:
+				if email_value_key in info.message.args:
+					email = info.message.args[email_value_key]
+					print 'Your Email is : %s' % email
+				if firstname_value_key in info.message.args:
+					firstname = info.message.args[firstname_value_key]
+					print 'Your Firstname is : %s' % firstname
+				if lastname_value_key in info.message.args:
+					lastname = info.message.args[lastname_value_key]
+					print 'Your Lastname is : %s' % lastname
+				if country_value_key in info.message.args:
+					country = info.message.args[country_value_key]
+					print 'Your Country is : %s' % country
+				if language_value_key in info.message.args:
+					language = info.message.args[language_value_key]
+					print 'Your Language is : %s' % language
 			print
 			print
 
@@ -109,13 +126,21 @@ Need install python-openid https://github.com/openid/python-openid
 """
 
 usage="""
-%(filename)s [-e] openid
-%(filename)s [-e] -g
+%(filename)s [-e] [-F] [-L] [-c] [-l] openid
+%(filename)s [-e] [-F] [-L] [-c] [-l] -g
 """ % {'filename' : filename}
 
 parser = argparse.ArgumentParser(description=description, usage=usage)
 parser.add_argument('-e', '--email', action='store_true',
 		help='Get Email Address')
+parser.add_argument('-F', '--firstname', action='store_true',
+		help='Get Firstname')
+parser.add_argument('-L', '--lastname', action='store_true',
+		help='Get Lastname')
+parser.add_argument('-c', '--country', action='store_true',
+		help='Get Country')
+parser.add_argument('-l', '--language', action='store_true',
+		help='Get Language')
 parser.add_argument('-g', '--login-with-google', action='store_true',
 		dest='login_with_google', help='Login with Google')
 parser.add_argument('openid', type=str, nargs='?', 
@@ -154,10 +179,27 @@ if __name__ == '__main__':
 		parser.print_help()
 		sys.exit(1)
 	
-	if args.email:
+	required = []
+	if args.email or args.firstname or args.lastname or args.country or args.language:
 		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'mode', 'fetch_request')
+	if args.email:
 		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'type.email', 'http://axschema.org/contact/email')
-		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'required', 'email')
+		required.append('email')
+	if args.firstname:
+		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'type.firstname', 'http://axschema.org/namePerson/first')
+		required.append('firstname')
+	if args.lastname:
+		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'type.lastname', 'http://axschema.org/namePerson/last')
+		required.append('lastname')
+	if args.country:
+		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'type.country', 'http://axschema.org/contact/country/home')
+		required.append('country')
+	if args.language:
+		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'type.language', 'http://axschema.org/pref/language')
+		required.append('language')
+	if required:
+		request.addExtensionArg('http://openid.net/srv/ax/1.0', 'required', ','.join(required))
+
 	url = request.redirectURL(realm, return_to, immediate=False)
 	if not url:
 		raise Exception('Authenticate url is None')

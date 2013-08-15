@@ -142,7 +142,7 @@ parser.add_argument('-c', '--country', action='store_true',
 parser.add_argument('-l', '--language', action='store_true',
 		help='Get Language')
 parser.add_argument('-g', '--login-with-google', action='store_true',
-		dest='login_with_google', help='Login with Google')
+		help='Login with Google')
 parser.add_argument('openid', type=str, nargs='?', 
 		help="Your OpenID, you can provide your OpenID or set -g for login with Google")
 

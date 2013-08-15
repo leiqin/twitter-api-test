@@ -138,9 +138,9 @@ usage="""
 """ % {'filename' : filename}
 
 parser = argparse.ArgumentParser(description=description, usage=usage)
-parser.add_argument('-i', '--id-token', action='store_true', dest='id_token',
+parser.add_argument('-i', '--id-token', action='store_true',
 		help='Print the Infomation of ID Token')
-parser.add_argument('-w', '--id-token-from-web', action='store_true', dest='id_token_from_web',
+parser.add_argument('-w', '--id-token-from-web', action='store_true',
 		help='Get the Infomation of ID Token from Web')
 parser.add_argument('-p', '--params', type=str, action='append', 
 		help='HTTP Params, Format name=value, you can set many times')

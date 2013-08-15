@@ -71,7 +71,7 @@ usage="""
 
 parser = argparse.ArgumentParser(description=description, usage=usage)
 
-parser.add_argument('-a', '--app-only', action='store_true', dest='app_only',
+parser.add_argument('-a', '--app-only', action='store_true', 
 		help="use Application-only authentication")
 parser.add_argument('-m', '--method', type=str, default='GET', 
 		help='HTTP Method, default GET, you can use "get" or "post"')

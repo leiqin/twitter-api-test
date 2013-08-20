@@ -43,7 +43,7 @@ def base64urlencode(value):
 		result = result[:-1]
 	return result
 
-def toJWT(jsonobj, alg='none',key=None):
+def toJWT(jsonobj, alg='none', key=None, header=None):
 	"""
 	对于 plaintext ， alg 为 none
 		不需要 key
@@ -55,7 +55,10 @@ def toJWT(jsonobj, alg='none',key=None):
 	"""
 	if alg not in algorithms:
 		raise Exception(u'不支持的算法 %s' % alg)
-	header = {'typ':'JWT', 'alg':alg}
+	if header is None:
+		header = {}
+	header['typ'] = 'JWT'
+	header['alg'] = alg
 	header = json.dumps(header)
 	header = base64urlencode(header)
 	message = json.dumps(jsonobj)

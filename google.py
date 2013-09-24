@@ -137,7 +137,8 @@ usage="""
 %(filename)s -c
 """ % {'filename' : filename}
 
-parser = argparse.ArgumentParser(description=description, usage=usage)
+parser = argparse.ArgumentParser(description=description, usage=usage,
+		formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument('-i', '--id-token', action='store_true',
 		help='Print the Infomation of ID Token')
 parser.add_argument('-w', '--id-token-from-web', action='store_true',

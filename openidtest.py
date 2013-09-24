@@ -130,7 +130,8 @@ usage="""
 %(filename)s [-e] [-F] [-L] [-c] [-l] -g
 """ % {'filename' : filename}
 
-parser = argparse.ArgumentParser(description=description, usage=usage)
+parser = argparse.ArgumentParser(description=description, usage=usage,
+		formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument('-e', '--email', action='store_true',
 		help='Get Email Address')
 parser.add_argument('-F', '--firstname', action='store_true',

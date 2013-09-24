@@ -96,7 +96,8 @@ usage="""
 %(filename)s -c
 """ % {'filename' : filename}
 
-parser = argparse.ArgumentParser(description=description, usage=usage)
+parser = argparse.ArgumentParser(description=description, usage=usage,
+		formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument('-p', '--params', type=str, action='append', 
 		help='HTTP Params, Format name=value, you can set many times, \
 				like "-p type=all -p sort=updated"')
